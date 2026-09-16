@@ -1,21 +1,26 @@
 const express = require("express");
-const path = require("path");
 require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
+// JSON parsing
 app.use(express.json());
 
+// Custom middleware to log requests
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
 });
 
+// Static HTML page
+app.use(express.static("public"));
+
+// GET /
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.send("My Week 2 API");
 });
 
+// POST /user
 app.post("/user", (req, res) => {
   const { name, email } = req.body;
 
@@ -26,22 +31,26 @@ app.post("/user", (req, res) => {
   }
 
   res.json({
-    message: `Hello, ${name}!`,
-    email: email
+    message: `Hello, ${name}!`
   });
 });
 
+// GET /user/:id
 app.get("/user/:id", (req, res) => {
   res.json({
     message: `User ${req.params.id} profile`
   });
 });
 
+// Error handling
 app.use((err, req, res, next) => {
+  console.error(err);
   res.status(500).json({
-    error: "Something went wrong"
+    error: "Internal server error"
   });
 });
+
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
